@@ -1,3 +1,5 @@
+# https://sachie-k.github.io/pyxel/wasm/launcher/?run=sachie-k.kurosuke.kurosuke.kurosuke
+
 import random
 import pyxel
 
