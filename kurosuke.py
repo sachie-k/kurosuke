@@ -60,16 +60,18 @@ class App:
         pyxel.load("kurosuke_ast.pyxres")
         
         self.scene = SCENE_TITLE
-        self.music_flg = False
-
-        self.cat = Cat(72, 32, 3, 1)
-        self.cha = Cha(-16, 32, 0, 0)
-        self.mike = Mike(-152, 32, 1, 0)
-        self.shiro = Shiro(-16, 64, 0, 0)
+        
+        self.cat = Cat(72, 16, 3, 1)
+        self.cha = Cha(-72, 16, 3, 0)
+        self.mike = Mike(-72, 16, 3, 0)
+        self.shiro = Shiro(-72, 16, 3, 0)
         self.dog = Dog(80, 64, 1)
         self.mouse = Mouse(80, 48, 0)
-        self.churu = Churu(-80, 16, 0)
+        self.churu = Churu(-32, 16, 0)
         self.churu_flame = 0
+        self.music_flg = False
+        
+        pyxel.playm(3, loop=True)
         
         pyxel.run(self.update, self.draw)
 
@@ -113,10 +115,8 @@ class App:
                     ((104 <= pyxel.mouse_x <= 120) and (176 <= pyxel.mouse_y <= 192) and pyxel.btn(pyxel.MOUSE_BUTTON_LEFT))): # チュール
                 self.churu.flg = 1
                 
-                if self.music_flg == False:
-                    pyxel.playm(0, loop=False)
-                    self.music_flg = True
-                self.music_flg = False
+                pyxel.playm(0, loop=False)
+
                 
                 self.churu_flame = pyxel.frame_count
 
@@ -288,10 +288,8 @@ class App:
             
             if (abs(self.mouse.x - self.cat.x) < 8 and abs(self.mouse.y - self.cat.y) < 8):
                 self.mouse.count += 1
-                if self.music_flg == False:
-                    pyxel.playm(2, loop=False)
-                    self.music_flg = True
-                self.music_flg = False
+                pyxel.playm(2, loop=False)
+
                 if self.mouse.count >= 10:
                     self.cat.status = 2
             
@@ -307,9 +305,8 @@ class App:
                     
                 if (self.mouse.x >= 75 and self.mouse.x <= 91) and self.mouse.y <= 52: # 犬
                     pos_f = 1
-                    
-                
 
+        
     def update(self):
 
         self.update_cat_move()
@@ -317,39 +314,28 @@ class App:
 
         if (self.mouse.count >= 3):
             if self.cha.status == 0:
-                self.cha = Cha(4, 32, 0, 1)
-                if self.music_flg == False:
-                    pyxel.playm(1, loop=False)
-                    self.music_flg = True
-                self.music_flg = False
+                self.cha = Cha(72, 16, 3, 1)
             self.update_cha_move()
         if (self.mouse.count >= 5):
             if self.mike.status == 0:
-                self.mike = Mike(148, 32, 0, 1)
-                if self.music_flg == False:
-                    pyxel.playm(1, loop=False)
-                    self.music_flg = True
-                self.music_flg = False
+                self.mike = Mike(72, 16, 3, 1)
             self.update_mike_move()
         if (self.mouse.count >= 8):
             if self.shiro.status == 0:
-                self.shiro = Shiro(4, 64, 0, 1)
-                if self.music_flg == False:
-                    pyxel.playm(1, loop=False)
-                    self.music_flg = True
-                self.music_flg = False
+                self.shiro = Shiro(72, 16, 3, 1)
             self.update_shiro_move()
         
         if self.churu.flg != 0:
-            self.churu = Churu(72, 16, 1)
+            self.churu = Churu(8, 16, 1)
             if pyxel.frame_count - self.churu_flame > 80:
-                self.churu = Churu(-72, 16, 0)
+                self.churu = Churu(-32, 16, 0)
                 self.churu_flame = 0
-            
+
         self.update_mouse_status()
         
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
+    
 
     def draw_title_scene(self):
         pyxel.bltm(0, 0, 1, 0, 0, 160, 96, 4) # タイルマップ
@@ -366,7 +352,7 @@ class App:
         pyxel.blt(56, 176, 1, 0, 240, 16, 16, 0) #left_down
         pyxel.blt(88, 176, 1, 32, 240, 16, 16, 0) #right_down
 
-        pyxel.blt((pyxel.frame_count)*0.1 % (pyxel.width + 100), 10, 1, 0, 48, 32, 16, 6)
+        pyxel.blt((pyxel.frame_count)*0.1 % (pyxel.width), 10, 1, 0, 48, 32, 16, 6)
         pyxel.blt((pyxel.frame_count) % (pyxel.width + 100), 72 + pyxel.frame_count % 5, 1, 16, 80, 16, 16, 6)
         pyxel.blt((pyxel.frame_count - 48) % (pyxel.width + 100), 76, 1, 0, 64, 16, 16, 6)
         pyxel.blt((pyxel.frame_count - 80) % (pyxel.width + 100), 76, 1, 16, 64, 16, 16, 6)
@@ -382,6 +368,7 @@ class App:
         if pyxel.btnp(pyxel.KEY_RETURN) or \
             (pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and (67 <= pyxel.mouse_x <= 99) and (90 <= pyxel.mouse_y <= 106)):
             self.scene = SCENE_PLAY
+            pyxel.stop()
 
     def draw_play_scene(self):
         global endroll_x
@@ -402,8 +389,12 @@ class App:
         pyxel.blt(88, 176, 1, 32, 240, 16, 16, 0) #right_down
 
         pyxel.blt(104, 176, 1, 48, 240, 16, 16, 0) #チュールボタン
-
+        
         if self.cat.status == 2 : # クリア
+            
+            if self.music_flg == False:
+                pyxel.playm(4, loop=False)
+                self.music_flg = True
             
             endroll_x += -1
             if endroll_x > 18:
@@ -411,17 +402,23 @@ class App:
             else:
                 self.scene = SCENE_TITLE
                 endroll_x = 160
-                self.cat = Cat(72, 32, 3, 1)
-                self.cha = Cha(-16, 32, 0, 0)
-                self.mike = Mike(-152, 32, 1, 0)
-                self.shiro = Shiro(-16, 64, 0, 0)
+                self.cat = Cat(72, 16, 3, 1)
+                self.cha = Cha(-72, 16, 3, 0)
+                self.mike = Mike(-72, 16, 3, 0)
+                self.shiro = Shiro(-72, 16, 3, 0)
                 self.dog = Dog(80, 64, 1)
                 self.mouse = Mouse(80, 48, 0)
-                self.churu = Churu(-72, 16, 0)
+                self.churu = Churu(-32, 16, 0)
+                pyxel.playm(3, loop=True)
+                self.music_flg = False
 
 
         if self.cat.status == 0: # 死んだ時
-
+        
+            if self.music_flg == False:
+                pyxel.playm(1, loop=False)
+                self.music_flg = True
+                    
             endroll_x += -1
             if endroll_x > 18:
                 pyxel.bltm(endroll_x, 32, 1, 0, 178, 128, 80, 3)
@@ -433,14 +430,15 @@ class App:
                     (pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and (67 <= pyxel.mouse_x <= 99) and (90 <= pyxel.mouse_y <= 106)):
                     self.scene = SCENE_TITLE
                     endroll_x = 160
-                    self.cat = Cat(72, 32, 3, 1)
-                    self.cha = Cha(-16, 32, 0, 0)
-                    self.mike = Mike(-152, 32, 1, 0)
-                    self.shiro = Shiro(-16, 64, 0, 0)
+                    self.cat = Cat(72, 16, 3, 1)
+                    self.cha = Cha(-72, 16, 3, 0)
+                    self.mike = Mike(-72, 16, 3, 0)
+                    self.shiro = Shiro(-72, 16, 3, 0)
                     self.dog = Dog(80, 64, 1)
                     self.mouse = Mouse(80, 48, 0)
-                    self.churu = Churu(-72, 16, 0)
-
+                    self.churu = Churu(-32, 16, 0)
+                    pyxel.playm(3, loop=True)
+                    self.music_flg = False
 
         text_mouse = "SCORE:{}".format(self.mouse.count)
         pyxel.text(5, 6, text_mouse, 8)
